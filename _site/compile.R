@@ -1,0 +1,1 @@
+servr::jekyll('.',command='/usr/local/opt/ruby/bin/jekyll build')
