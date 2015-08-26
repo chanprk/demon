@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Kalman Filter</title>
+    <meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+">
+
+    <link rel="stylesheet" href="/demon//css/main.css">
+    <link rel="canonical" href="http://yourdomain.com/demon//2015/08/KF.html">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/demon//">Quant Diary</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/demon//about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Kalman Filter</h1>
+    <p class="post-meta">Aug 25, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <h2 id="forward-filtering-backward-smoothing">Forward Filtering, Backward Smoothing</h2>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">kfilter</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+    <span class="n">x_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">);</span> <span class="n">v_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+    <span class="n">x_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">);</span> <span class="n">v_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+    <span class="n">x_f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span><span class="p">;</span> <span class="n">v_f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+        <span class="n">x_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span><span class="o">*</span><span class="n">x_f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">v_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span><span class="o">*</span><span class="n">v_f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span> <span class="o">+</span> <span class="n">Q</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">v_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">C</span><span class="o">/</span><span class="p">(</span><span class="n">C</span><span class="o">*</span><span class="n">v_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">C</span><span class="o">+</span><span class="n">R</span><span class="p">)</span>
+        <span class="n">x_f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">K</span><span class="o">*</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">C</span><span class="o">*</span><span class="n">x_p</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">v_f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">K</span><span class="o">*</span><span class="n">C</span><span class="o">*</span><span class="n">v_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;x_f&#39;</span><span class="p">:</span><span class="n">x_f</span><span class="p">,</span><span class="s">&#39;v_f&#39;</span><span class="p">:</span><span class="n">v_f</span><span class="p">,</span><span class="s">&#39;x_p&#39;</span><span class="p">:</span><span class="n">x_p</span><span class="p">,</span><span class="s">&#39;v_p&#39;</span><span class="p">:</span><span class="n">v_p</span><span class="p">,</span> <span class="s">&#39;K_T&#39;</span><span class="p">:</span><span class="n">K</span><span class="p">}</span>
+<span class="n">ans1</span> <span class="o">=</span> <span class="n">kfilter</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">ksmooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">x_f</span><span class="p">,</span> <span class="n">v_f</span><span class="p">,</span> <span class="n">x_p</span><span class="p">,</span> <span class="n">v_p</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">vvT</span><span class="p">):</span>
+    <span class="n">x_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">);</span> <span class="n">v_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">);</span> <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+    <span class="n">x_s</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_f</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span> <span class="n">v_s</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_f</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">P</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span>  <span class="n">v_s</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_s</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x_s</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">num</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="o">/</span><span class="n">v_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">x_s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">x_s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">x_p</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">v_s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">v_s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">v_p</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span>  <span class="n">v_s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x_s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">PP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="n">vv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">vv</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">vvT</span><span class="p">;</span> <span class="n">PP</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">vv</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_s</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x_s</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">num</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">vv</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">vv</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">A</span><span class="o">*</span><span class="n">v_f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">PP</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">vv</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x_s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;x_s&#39;</span><span class="p">:</span><span class="n">x_s</span><span class="p">,</span><span class="s">&#39;v_s&#39;</span><span class="p">:</span><span class="n">v_s</span><span class="p">,</span><span class="s">&#39;J&#39;</span><span class="p">:</span><span class="n">J</span><span class="p">,</span><span class="s">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">,</span><span class="s">&#39;PP&#39;</span><span class="p">:</span><span class="n">PP</span><span class="p">}</span></code></pre></div>
+
+<h3 id="local-level-model">Local level model</h3>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span><span class="p">;</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="n">num</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> <span class="n">x0</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">v0</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">A</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">C</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">Q</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">num</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">num</span><span class="p">);</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">mu</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">v</span><span class="p">;</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">mu</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="s">&#39;k&#39;</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s">&#39;bo&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></code></pre></div>
+
+<p><img src="/demon/figure/locallev1.png" alt="mu" />  </p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">ans1</span> <span class="o">=</span> <span class="n">kfilter</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+<span class="n">x_f</span> <span class="o">=</span> <span class="n">ans1</span><span class="p">[</span><span class="s">&#39;x_f&#39;</span><span class="p">];</span> <span class="n">v_f</span> <span class="o">=</span> <span class="n">ans1</span><span class="p">[</span><span class="s">&#39;v_f&#39;</span><span class="p">];</span> <span class="n">x_p</span> <span class="o">=</span> <span class="n">ans1</span><span class="p">[</span><span class="s">&#39;x_p&#39;</span><span class="p">];</span> <span class="n">v_p</span> <span class="o">=</span> <span class="n">ans1</span><span class="p">[</span><span class="s">&#39;v_p&#39;</span><span class="p">];</span> <span class="n">K_T</span> <span class="o">=</span> <span class="n">ans1</span><span class="p">[</span><span class="s">&#39;K_T&#39;</span><span class="p">];</span>
+<span class="n">ans2</span> <span class="o">=</span> <span class="n">ksmooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">x_f</span><span class="p">,</span> <span class="n">v_f</span><span class="p">,</span> <span class="n">x_p</span><span class="p">,</span> <span class="n">v_p</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">K_T</span><span class="o">*</span><span class="n">C</span><span class="p">)</span><span class="o">*</span><span class="n">A</span><span class="o">*</span><span class="n">v_f</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">2</span><span class="p">]);</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">311</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">mu</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="s">&#39;bo&#39;</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;x_p&#39;</span><span class="p">],</span><span class="s">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;x_p&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;v_p&#39;</span><span class="p">]),</span><span class="s">&#39;--r&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;x_p&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;v_p&#39;</span><span class="p">]),</span><span class="s">&#39;--r&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">312</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">mu</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="s">&#39;bo&#39;</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;x_f&#39;</span><span class="p">],</span> <span class="s">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;x_f&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;v_f&#39;</span><span class="p">]),</span><span class="s">&#39;--r&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;x_f&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ans1</span><span class="p">[</span><span class="s">&#39;v_f&#39;</span><span class="p">]),</span><span class="s">&#39;--r&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">313</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">mu</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="s">&#39;bo&#39;</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">ans2</span><span class="p">[</span><span class="s">&#39;x_s&#39;</span><span class="p">],</span> <span class="s">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">ans2</span><span class="p">[</span><span class="s">&#39;x_s&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ans2</span><span class="p">[</span><span class="s">&#39;v_s&#39;</span><span class="p">]),</span><span class="s">&#39;--r&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">ans2</span><span class="p">[</span><span class="s">&#39;x_s&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ans2</span><span class="p">[</span><span class="s">&#39;v_s&#39;</span><span class="p">]),</span><span class="s">&#39;--r&#39;</span><span class="p">);</span></code></pre></div>
+
+<p><img src="/demon/figure/locallev2.png" alt="est" />  </p>
+
+<h2 id="parameter-learning">Parameter Learning</h2>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">kslearn</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">flt</span> <span class="o">=</span> <span class="n">kfilter</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+        <span class="n">x_f</span> <span class="o">=</span> <span class="n">flt</span><span class="p">[</span><span class="s">&#39;x_f&#39;</span><span class="p">];</span> <span class="n">v_f</span> <span class="o">=</span> <span class="n">flt</span><span class="p">[</span><span class="s">&#39;v_f&#39;</span><span class="p">]</span>
+        <span class="n">x_p</span> <span class="o">=</span> <span class="n">flt</span><span class="p">[</span><span class="s">&#39;x_p&#39;</span><span class="p">];</span> <span class="n">v_p</span> <span class="o">=</span> <span class="n">flt</span><span class="p">[</span><span class="s">&#39;v_p&#39;</span><span class="p">];</span> <span class="n">K_T</span> <span class="o">=</span> <span class="n">flt</span><span class="p">[</span><span class="s">&#39;K_T&#39;</span><span class="p">]</span>
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">ksmooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">x_f</span><span class="p">,</span> <span class="n">v_f</span><span class="p">,</span> <span class="n">x_p</span><span class="p">,</span> <span class="n">v_p</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">K_T</span><span class="o">*</span><span class="n">C</span><span class="p">)</span><span class="o">*</span><span class="n">A</span><span class="o">*</span><span class="n">v_f</span><span class="p">[</span><span class="n">num</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">x_s</span> <span class="o">=</span> <span class="n">sm</span><span class="p">[</span><span class="s">&#39;x_s&#39;</span><span class="p">];</span> <span class="n">P</span> <span class="o">=</span> <span class="n">sm</span><span class="p">[</span><span class="s">&#39;P&#39;</span><span class="p">];</span> <span class="n">PP</span> <span class="o">=</span> <span class="n">sm</span><span class="p">[</span><span class="s">&#39;PP&#39;</span><span class="p">]</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="o">*</span><span class="n">x_s</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># eps is normalized</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="o">*</span><span class="n">y</span><span class="o">-</span><span class="n">C</span><span class="o">*</span><span class="n">x_s</span><span class="o">*</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">num</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">PP</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">P</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="n">x_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">v0</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="n">x0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span></code></pre></div>
+
+<h3 id="ar1-with-observation-noise">AR(1) with Observation Noise</h3>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.arima_process</span> <span class="kn">import</span> <span class="n">arma_generate_sample</span><span class="p">,</span> <span class="n">ArmaProcess</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">series</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="n">phiList</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.01</span><span class="p">,</span><span class="o">-</span><span class="mf">0.7</span><span class="p">,</span><span class="o">-</span><span class="mf">0.99</span><span class="p">]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">2015</span><span class="p">);</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">phi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">phiList</span><span class="p">):</span>
+    <span class="n">arparams</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="n">phi</span><span class="p">])</span>
+    <span class="n">maparams</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">arma_t</span> <span class="o">=</span> <span class="n">ArmaProcess</span><span class="p">(</span><span class="n">arparams</span><span class="p">,</span> <span class="n">maparams</span><span class="p">)</span>
+    <span class="n">series</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arma_t</span><span class="o">.</span><span class="n">generate_sample</span><span class="p">(</span><span class="n">nsample</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">311</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">series</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></code></pre></div>
+
+<p><img src="/demon/figure/ar1.png" alt="mu" /></p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">estIndexbyNoise</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">nList</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">initpars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span> <span class="c"># random initial values of x0, v0, A, C, Q, R</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">noise</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nList</span><span class="p">):</span>
+    <span class="n">est</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">learn</span> <span class="o">=</span> <span class="n">klearn</span><span class="p">(</span><span class="n">series</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">noise</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span> <span class="mi">100</span><span class="p">,</span> <span class="o">*</span><span class="n">initpars</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">500</span><span class="p">):</span>
+            <span class="n">learn</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">est</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">estIndexbyNoise</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">est</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;noise={0}  phi1={1:6.3f}, phi2={2:6.3f}, phi3={3:6.3f} </span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="o">*</span><span class="n">est</span><span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## noise=0.11  phi1=-0.094, phi2=-0.763, phi3=-0.984 
+## noise=0.31  phi1=-0.106, phi2=-0.738, phi3=-0.984 
+## noise=0.51  phi1= 0.065, phi2=-0.797, phi3=-0.979 
+## noise=0.71  phi1= 0.083, phi2=-0.791, phi3=-0.989 
+## noise=0.91  phi1=-0.137, phi2=-0.801, phi3=-0.991 
+## noise=1.11  phi1=-0.396, phi2=-0.716, phi3=-0.992 
+## noise=1.31  phi1= 0.130, phi2=-0.897, phi3=-0.995</code></pre></div>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">estIndexbySerie</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">estIndexbyNoise</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">311</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">nList</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">estIndexbySerie</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">phiList</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">xmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">xmax</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s">&quot;blue&quot;</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymin</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span><span class="n">ymax</span><span class="o">+</span><span class="mf">0.05</span><span class="p">)</span>
+    
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></code></pre></div>
+
+<p><img src="/demon/figure/ar2.png" alt="mu" /></p>
+
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Quant Diary</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li>Quant Diary</li>
+          <li><a href="mailto:chanp.contact@gmail.com">chanp.contact@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/chanprk">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">chanprk</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <p class="text">Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
