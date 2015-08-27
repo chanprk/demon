@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Johansen Procedure</title>
+    <meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+">
+
+    <link rel="stylesheet" href="/demon//css/main.css">
+    <link rel="canonical" href="http://yourdomain.com/demon//2015/07/JP.html">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/demon//">Quant Diary</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/demon//about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Johansen Procedure</h1>
+    <p class="post-meta">Jul 25, 2015</p>
+  </header>
+
+  <article class="post-content">
+    
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="kn">require</span><span class="p">(</span>urca<span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Loading required package: urca
+## Loading required package: methods</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">da<span class="o">=</span>read.table<span class="p">(</span><span class="s">&#39;d-bhp0206.txt&#39;</span><span class="p">,</span>header<span class="o">=</span><span class="bp">T</span><span class="p">);</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Warning in file(file, &quot;rt&quot;): cannot open file &#39;d-bhp0206.txt&#39;: No such
+## file or directory</code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in file(file, &quot;rt&quot;): cannot open the connection</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">da1<span class="o">=</span>read.table<span class="p">(</span><span class="s">&#39;d-vale0206.txt&#39;</span><span class="p">,</span>header<span class="o">=</span><span class="bp">T</span><span class="p">);</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Warning in file(file, &quot;rt&quot;): cannot open file &#39;d-vale0206.txt&#39;: No
+## such file or directory</code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in file(file, &quot;rt&quot;): cannot open the connection</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1"># log close</span>
+bhp<span class="o">=</span><span class="kp">log</span><span class="p">(</span>da<span class="p">[,</span><span class="m">9</span><span class="p">]);</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in eval(expr, envir, enclos): object &#39;da&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">vale<span class="o">=</span><span class="kp">log</span><span class="p">(</span>da1<span class="p">[,</span><span class="m">9</span><span class="p">]);</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in eval(expr, envir, enclos): object &#39;da1&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">par<span class="p">(</span>mfrow<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">))</span>
+plot<span class="p">(</span>bhp<span class="p">,</span>type<span class="o">=</span><span class="s">&#39;l&#39;</span><span class="p">);</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in plot(bhp, type = &quot;l&quot;): error in evaluating the argument &#39;x&#39; in selecting a method for function &#39;plot&#39;: Error: object &#39;bhp&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">plot<span class="p">(</span>vale<span class="p">,</span>type<span class="o">=</span><span class="s">&#39;l&#39;</span><span class="p">);</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in plot(vale, type = &quot;l&quot;): error in evaluating the argument &#39;x&#39; in selecting a method for function &#39;plot&#39;: Error: object &#39;vale&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">x<span class="o">=</span><span class="kp">cbind</span><span class="p">(</span>bhp<span class="p">,</span>vale<span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in cbind(bhp, vale): object &#39;bhp&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">m1<span class="o">=</span>ar<span class="p">(</span>x<span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in ar.yw(x, aic = aic, order.max = order.max, na.action = na.action, : object &#39;x&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#m1$order</span>
+m2<span class="o">=</span>ca.jo<span class="p">(</span>x<span class="p">,</span>K<span class="o">=</span><span class="m">2</span><span class="p">,</span>spec<span class="o">=</span><span class="s">&#39;transitory&#39;</span><span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in as.matrix(x): object &#39;x&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="kp">summary</span><span class="p">(</span>m2<span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in summary(m2): error in evaluating the argument &#39;object&#39; in selecting a method for function &#39;summary&#39;: Error: object &#39;m2&#39; not found</code></pre></div>
+
+<p>By setting K=2,spec=’transitory’, we fit the following model (See <a href="https://cran.r-project.org/web/packages/urca/urca.pdf">urca’s manual</a>.)</p>
+
+<p>…transitory lag = K-1, level lag = 1</p>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">rel <span class="o">=</span>  x <span class="o">%*%</span> m2<span class="o">@</span>V<span class="p">;</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in eval(expr, envir, enclos): object &#39;x&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">par<span class="p">(</span>mfrow<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">))</span>
+plot<span class="p">(</span>rel<span class="p">[,</span><span class="m">1</span><span class="p">],</span>type <span class="o">=</span> <span class="s">&#39;l&#39;</span><span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in plot(rel[, 1], type = &quot;l&quot;): error in evaluating the argument &#39;x&#39; in selecting a method for function &#39;plot&#39;: Error: object &#39;rel&#39; not found</code></pre></div>
+
+<div class="highlight"><pre><code class="language-r" data-lang="r">plot<span class="p">(</span>rel<span class="p">[,</span><span class="m">2</span><span class="p">],</span>type <span class="o">=</span> <span class="s">&#39;l&#39;</span><span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Error in plot(rel[, 2], type = &quot;l&quot;): error in evaluating the argument &#39;x&#39; in selecting a method for function &#39;plot&#39;: Error: object &#39;rel&#39; not found</code></pre></div>
+
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Quant Diary</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li>Quant Diary</li>
+          <li><a href="mailto:chanp.contact@gmail.com">chanp.contact@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/chanprk">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">chanprk</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <p class="text">Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
