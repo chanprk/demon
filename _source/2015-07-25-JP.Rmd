@@ -1,0 +1,41 @@
+---
+layout: post
+title:  "Johansen Procedure"
+categories: [jekyll, rstats]
+tags: [knitr, servr, httpuv, websocket]
+---
+
+```{r, results='hide'}
+require(urca)
+
+da=read.table('d-bhp0206.txt',header=T);
+da1=read.table('d-vale0206.txt',header=T);
+
+# log close
+bhp=log(da[,9]);
+vale=log(da1[,9]);
+
+par(mfrow=c(2,1))
+plot(bhp,type='l');
+plot(vale,type='l');
+``` 
+
+```{r}
+x=cbind(bhp,vale)
+m1=ar(x)
+#m1$order
+m2=ca.jo(x,K=2,spec='transitory')
+summary(m2)
+```
+
+By setting K=2,spec='transitory', we fit the following model (See [urca's manual](https://cran.r-project.org/web/packages/urca/urca.pdf).)
+
+...transitory lag = K-1, level lag = 1
+
+
+```{r}
+rel =  x %*% m2@V;
+par(mfrow=c(2,1))
+plot(rel[,1],type = 'l')
+plot(rel[,2],type = 'l') 
+```
