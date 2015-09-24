@@ -117,9 +117,11 @@ m2<span class="o">=</span>ca.jo<span class="p">(</span>x<span class="p">,</span>
 ## bhp.d  -0.06272119 -2.179372e-05
 ## vale.d  0.03303036 -3.274248e-05</code></pre></div>
 
-<p>By setting K=2,spec=’transitory’, we fit the following model (See <a href="https://cran.r-project.org/web/packages/urca/urca.pdf">urca’s manual</a>.)</p>
+<!-- By setting K=2,spec='transitory', we fit the following model (See [urca's manual](https://cran.r-project.org/web/packages/urca/urca.pdf).)
 
-<p>…transitory lag = K-1, level lag = 1</p>
+...transitory lag = K-1, level lag = 1 -->
+
+<p>The first linear combination of original time series is stationary with a mean about 1.80, whereas the second linear combination exhibits trend.</p>
 
 <div class="highlight"><pre><code class="language-r" data-lang="r">rel <span class="o">=</span>  x <span class="o">%*%</span> m2<span class="o">@</span>V<span class="p">;</span>
 par<span class="p">(</span>mfrow<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">))</span>

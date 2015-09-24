@@ -6,8 +6,8 @@
 </description>
     <link>http://yourdomain.com/demon//</link>
     <atom:link href="http://yourdomain.com/demon//feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 24 Sep 2015 01:33:58 +0100</pubDate>
-    <lastBuildDate>Thu, 24 Sep 2015 01:33:58 +0100</lastBuildDate>
+    <pubDate>Thu, 24 Sep 2015 01:45:50 +0100</pubDate>
+    <lastBuildDate>Thu, 24 Sep 2015 01:45:50 +0100</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
     
       <item>
@@ -226,9 +226,11 @@ m2&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ca.jo&lt;span class=&quot;p&quot
 ## bhp.d  -0.06272119 -2.179372e-05
 ## vale.d  0.03303036 -3.274248e-05&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;By setting K=2,spec=’transitory’, we fit the following model (See &lt;a href=&quot;https://cran.r-project.org/web/packages/urca/urca.pdf&quot;&gt;urca’s manual&lt;/a&gt;.)&lt;/p&gt;
+&lt;!-- By setting K=2,spec=&#39;transitory&#39;, we fit the following model (See [urca&#39;s manual](https://cran.r-project.org/web/packages/urca/urca.pdf).)
 
-&lt;p&gt;…transitory lag = K-1, level lag = 1&lt;/p&gt;
+...transitory lag = K-1, level lag = 1 --&gt;
+
+&lt;p&gt;The first linear combination of original time series is stationary with a mean about 1.80, whereas the second linear combination exhibits trend.&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;rel &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;  x &lt;span class=&quot;o&quot;&gt;%*%&lt;/span&gt; m2&lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;V&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 par&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;mfrow&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;

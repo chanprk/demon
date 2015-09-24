@@ -28,10 +28,11 @@ m2=ca.jo(x,K=2,spec='transitory')
 summary(m2)
 ```
 
-By setting K=2,spec='transitory', we fit the following model (See [urca's manual](https://cran.r-project.org/web/packages/urca/urca.pdf).)
+<!-- By setting K=2,spec='transitory', we fit the following model (See [urca's manual](https://cran.r-project.org/web/packages/urca/urca.pdf).)
 
-...transitory lag = K-1, level lag = 1
+...transitory lag = K-1, level lag = 1 -->
 
+The first linear combination of original time series is stationary with a mean about 1.80, whereas the second linear combination exhibits trend.
 
 ```{r}
 rel =  x %*% m2@V;
