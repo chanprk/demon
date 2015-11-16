@@ -54,3 +54,45 @@ plot(y1,type = 'l')
 abline(h=1.83, col='red')
 abline(h=1.77, col='green')
 ```
+
+
+```{python}
+import pandas as pd
+import numpy as np
+from numpy.linalg import inv,eig,cholesky
+from math import sqrt
+import matplotlib.pyplot as plt
+
+da=pd.read_csv('d-bhp0206.txt',delim_whitespace=True)
+da1=pd.read_csv('d-vale0206.txt',delim_whitespace=True)
+x_t = np.log(np.matrix([da.adjclose, da1.adjclose]))
+dx_t = np.diff(x_t)
+Z_0t = dx_t[:,1:]  # dx_t
+Z_1t = x_t[:,1:-1] # x_t-1
+T = max(Z_0t.shape)
+Z_2t = np.concatenate((np.ones((1,T)),dx_t[:,:-1])) # dx_t-1
+M_00 = (Z_0t * Z_0t.T) / T;
+M_01 = (Z_0t * Z_1t.T) / T;
+M_02 = (Z_0t * Z_2t.T) / T;
+M_11 = (Z_1t * Z_1t.T) / T;
+M_12 = (Z_1t * Z_2t.T) / T;
+M_22 = (Z_2t * Z_2t.T) / T;
+M_21 = M_12.T;
+M_20 = M_02.T;
+M_10 = M_01.T;
+S_11 = M_11 - M_12*inv(M_22)*M_21;
+S_10 = M_10 - M_12*inv(M_22)*M_20;
+S_00 = M_00 - M_02*inv(M_22)*M_20;
+S_01 = M_01 - M_02*inv(M_22)*M_21;
+
+L = cholesky(S_11)
+v,w =  eig(inv(L)*S_10*inv(S_00)*S_01*inv(L.T));
+W = inv(L.T)*w
+const = W.max(axis=0)
+W = np.divide(W,const)
+res = W[::,1].T * x_t
+plt.plot(np.asarray(res)[0])
+plt.savefig("spread.png")
+```
+
+![mu](/spread.png) 
