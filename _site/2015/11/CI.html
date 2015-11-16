@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title>Quant Diary</title>
+    <title>Cointegration</title>
     <meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
 ">
 
     <link rel="stylesheet" href="/demon//css/main.css">
-    <link rel="canonical" href="http://yourdomain.com/demon//">
+    <link rel="canonical" href="http://yourdomain.com/demon//2015/11/CI.html">
 </head>
 
 
@@ -54,39 +54,32 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <div class="home">
+        <div class="post">
 
-  <h1 class="page-heading">Posts</h1>
+  <header class="post-header">
+    <h1 class="post-title">Cointegration</h1>
+    <p class="post-meta">Nov 16, 2015</p>
+  </header>
 
-  <ul class="post-list">
+  <article class="post-content">
     
-      <li>
-        <span class="post-meta">Nov 16, 2015</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">da</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">&#39;d-bhp0206.txt&#39;</span><span class="p">,</span><span class="n">delim_whitespace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">da1</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">&#39;d-vale0206.txt&#39;</span><span class="p">,</span><span class="n">delim_whitespace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">x_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([</span><span class="n">da</span><span class="o">.</span><span class="n">adjclose</span><span class="p">,</span> <span class="n">da1</span><span class="o">.</span><span class="n">adjclose</span><span class="p">]))</span>
+<span class="n">x_t</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span></code></pre></div>
 
-        <h2>
-          <a class="post-link" href="/demon//2015/11/CI.html">Cointegration</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Aug 25, 2015</span>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x_t</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])[</span><span class="mi">0</span><span class="p">])</span></code></pre></div>
 
-        <h2>
-          <a class="post-link" href="/demon//2015/08/KF.html">Kalman Filter</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jul 25, 2015</span>
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Traceback (most recent call last):
+##   File &quot;&lt;string&gt;&quot;, line 3, in &lt;module&gt;
+## NameError: name &#39;np&#39; is not defined</code></pre></div>
 
-        <h2>
-          <a class="post-link" href="/demon//2015/07/JP.html">Johansen Procedure</a>
-        </h2>
-      </li>
-    
-  </ul>
 
-  <p class="rss-subscribe">subscribe <a href="/demon//feed.xml">via RSS</a></p>
+  </article>
 
 </div>
 
