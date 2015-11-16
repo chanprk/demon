@@ -91,6 +91,7 @@ W = inv(L.T)*w
 const = W.max(axis=0)
 W = np.divide(W,const)
 res = W[::,1].T * x_t
+plt.subplot(211)
 plt.plot(np.asarray(res)[0])
 plt.savefig("spread.png")
 ```
