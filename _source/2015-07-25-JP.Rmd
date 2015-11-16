@@ -55,6 +55,7 @@ abline(h=1.83, col='red')
 abline(h=1.77, col='green')
 ```
 
+Below are python code to produce similar result.
 
 ```{python}
 import pandas as pd
@@ -96,4 +97,3 @@ plt.plot(np.asarray(res)[0])
 plt.savefig("spread.png")
 ```
 
-![mu](/spread.png) 
